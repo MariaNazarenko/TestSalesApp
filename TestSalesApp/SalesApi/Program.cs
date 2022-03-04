@@ -1,14 +1,20 @@
+using SalesApi.Models;
 using SalesApi.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((context, config) => { config.WriteTo.Console(); });
+
 // Add services to the container.
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+builder.Services.AddDbContext<DataContext>();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddTransient<ISalesService, SalesService>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<ISalesService, SalesService>();
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SalesApi.Models;
+using SalesApi.Services;
 
 namespace SalesApi.Controllers
 {
@@ -7,31 +8,41 @@ namespace SalesApi.Controllers
     [Route("API/[controller]")]
     public class MuffinController : ControllerBase
     {
-        private readonly ILogger<MuffinController> _logger;
+        private readonly ISalesService _salesService;
 
-        public MuffinController(ILogger<MuffinController> logger)
+        public MuffinController(ISalesService salesService)
         {
-            _logger = logger;
+            _salesService = salesService;
         }
 
-
+        /// <summary>
+        /// Покупка мафиинов
+        /// </summary>
+        /// <param name="countMuffin">Кол-во маффинов</param>
+        /// <returns>200 - успешно. 400 - ошибка</returns>
         [HttpPost]
-        public ActionResult BuyMaffin()
+        public ActionResult BuyMaffin(int countMuffin)
         {
-            return Ok();
+            try
+            {
+                _salesService.Buy(countMuffin);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
+        /// <summary>
+        /// Получение отчета
+        /// </summary>
+        /// <returns>Список мафиинов</returns>
         [HttpGet]
         [Route("Report")]
-        public List<Muffin> GetReport()
+        public IEnumerable<Muffin> GetReport()
         {
-            var muffinList = new List<Muffin>();
-            var muffin = new Muffin { Id = 1};
-            var muffin2 = new Muffin { Id = 2};
-            muffinList.Add(muffin);
-            muffinList.Add(muffin2);
-
-            return muffinList;
+            return _salesService.GetReport();
         }
     }
 }
