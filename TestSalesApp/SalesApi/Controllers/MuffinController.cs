@@ -35,6 +35,19 @@ namespace SalesApi.Controllers
         }
 
         /// <summary>
+        /// Создать маффины
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Сreate")]
+        public ActionResult CreateMuffin()
+        {
+            _salesService.Create();
+            return Ok();
+        }
+
+
+        /// <summary>
         /// Получение отчета
         /// </summary>
         /// <returns>Список мафиинов</returns>
@@ -42,7 +55,8 @@ namespace SalesApi.Controllers
         [Route("Report")]
         public IEnumerable<Muffin> GetReport()
         {
-            return _salesService.GetReport();
+            var result = _salesService.GetReport();
+            return result;
         }
     }
 }

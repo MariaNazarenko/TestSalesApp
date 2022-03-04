@@ -12,11 +12,6 @@ namespace SalesApi.Services
         private readonly int maxCountBuyMuffin = 3;
 
         /// <summary>
-        /// Кол-во создаваемых маффинов
-        /// </summary>
-        private readonly int countCreateMuffin = 10;
-
-        /// <summary>
         /// Срок годности в минутах
         /// </summary>
         private readonly int lifetimeMuffin = 1;
@@ -37,7 +32,7 @@ namespace SalesApi.Services
             if (countMuffin <= maxCountBuyMuffin)
             {
                 var muffins = _context.Muffins.Where(m => m.DateCreate > DateTime.Now.AddMinutes(-lifetimeMuffin) && m.Status == StatusMaffin.Supplied).OrderBy(m => m.DateCreate).Take(countMuffin);
-                if (muffins.Count() < maxCountBuyMuffin)
+                if (muffins.Count() == countMuffin)
                 {
                     foreach(var muffin in muffins)
                     {
@@ -60,12 +55,9 @@ namespace SalesApi.Services
 
         public void Create()
         {
-            for(int i = 0; i < countCreateMuffin; i++)
-            {
-                Muffin muffin = new Muffin();
-                _context.Muffins.Add(muffin);
-                _logger.LogInformation($"Добавлена запись с датой создания{muffin.DateCreate} со статусом поставлена");
-            }
+            Muffin muffin = new Muffin();
+            _context.Muffins.Add(muffin);
+            _logger.LogInformation($"Добавлена запись с датой создания {muffin.DateCreate} со статусом поставлена");
             _context.SaveChanges();
         }
 

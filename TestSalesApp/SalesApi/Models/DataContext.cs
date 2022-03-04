@@ -24,7 +24,7 @@ namespace SalesApi.Models
         public DbSet<Muffin> Muffins { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Muffin>().ToTable("muffins");
+            builder.Entity<Muffin>().ToTable("muffin");
         }
 
     }

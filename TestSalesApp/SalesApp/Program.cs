@@ -1,15 +1,25 @@
 ﻿using Newtonsoft.Json;
 using SalesApi.Models;
+using System.Net.Http.Headers;
 
 string url = "https://localhost:7324";
+string userName = "user";
+string userPwd = "qwerty";
+
 Console.WriteLine("Отправляем запрос на отчет");
 try
 {
     string responseContent;
     using (HttpClient client = new HttpClient())
     {
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+        "Basic", Convert.ToBase64String(
+            System.Text.ASCIIEncoding.ASCII.GetBytes(
+               $"{userName}:{userPwd}")));
         HttpResponseMessage message = client.GetAsync($"{url}/api/muffin/report").GetAwaiter().GetResult();
         responseContent = message.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+        if (message.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            Console.WriteLine("Ошибка аунтефикации");
     }
 
     var result = JsonConvert.DeserializeObject<List<Muffin>>(responseContent);
@@ -38,11 +48,10 @@ catch (Exception ex)
     Console.WriteLine(ex.Message);
 }
 
-ConsoleKey key = ConsoleKey.Enter;
+Console.WriteLine("Для начала работы введите любой символ, для выхода Q");
+ConsoleKey key = Console.ReadKey().Key;
 while (key != ConsoleKey.Q)
 {
-    Console.WriteLine("Для начала работы введите любой символ, для выхода Q");
-    key = Console.ReadKey().Key;
     Console.WriteLine();
     Console.WriteLine("Введите кол-во маффинов:");
     var answer = Console.ReadLine();
@@ -55,10 +64,16 @@ while (key != ConsoleKey.Q)
                 string responseContent;
                 using (HttpClient client = new HttpClient())
                 {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                    "Basic", Convert.ToBase64String(
+                        System.Text.ASCIIEncoding.ASCII.GetBytes(
+                           $"{userName}:{userPwd}")));
                     HttpResponseMessage message = client.PostAsync($"{url}/api/muffin?countMuffin={countMuffin}", null).GetAwaiter().GetResult();
                     responseContent = message.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     if (message.StatusCode == System.Net.HttpStatusCode.BadRequest)
                         Console.WriteLine(responseContent);
+                    else if (message.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                        Console.WriteLine("Ошибка аунтефикации");
                 }
             }
             catch (Exception ex)
@@ -67,9 +82,12 @@ while (key != ConsoleKey.Q)
             }
         else
             Console.WriteLine("Количество должно быть > 0");
+
     }
-    catch 
+    catch
     {
         Console.WriteLine("Неккоректно введено кол-во маффикнов");
     }
+    Console.WriteLine("Для продолжения работы введите любой символ, для выхода Q");
+    key = Console.ReadKey().Key;
 }

@@ -1,0 +1,15 @@
+﻿version: "3.9"
+services:
+  postgreserver:
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+      - ./dbscripts/seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: qwerty
+volumes:
+    db_volume:
