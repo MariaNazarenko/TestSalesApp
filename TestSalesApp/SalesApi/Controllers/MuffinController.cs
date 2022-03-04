@@ -23,15 +23,10 @@ namespace SalesApi.Controllers
         [HttpPost]
         public ActionResult BuyMaffin(int countMuffin)
         {
-            try
-            {
-                _salesService.Buy(countMuffin);
+            if (_salesService.Buy(countMuffin)== true)
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            else 
+                return BadRequest("Нет маффинов соответсвующих условиям продажи");
         }
 
         /// <summary>
@@ -53,10 +48,9 @@ namespace SalesApi.Controllers
         /// <returns>Список мафиинов</returns>
         [HttpGet]
         [Route("Report")]
-        public IEnumerable<Muffin> GetReport()
+        public MuffinReport GetReport()
         {
-            var result = _salesService.GetReport();
-            return result;
+            return _salesService.GetReport();
         }
     }
 }

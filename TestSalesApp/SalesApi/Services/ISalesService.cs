@@ -4,9 +4,8 @@ namespace SalesApi.Services
 {
     public interface ISalesService
     {
-        public void Create();
-        public IEnumerable<Muffin> GetReport();
-        public void Buy(int countMuffin);
-
+        public Muffin Create();
+        public MuffinReport GetReport();
+        public bool Buy(int countMuffin);
     }
 }

@@ -22,21 +22,13 @@ try
             Console.WriteLine("Ошибка аунтефикации");
     }
 
-    var result = JsonConvert.DeserializeObject<List<Muffin>>(responseContent);
+    var result = JsonConvert.DeserializeObject<MuffinReport>(responseContent);
     if (result != null)
     {
         Console.WriteLine("Отчет");
-        Console.WriteLine("Ид\tВремя создания\tСостояние");
-        foreach (var muffin in result)
-        {
-            Console.Write(muffin.Id + "\t" + muffin.DateCreate + "\t");
-            if (muffin.Status == StatusMaffin.Supplied)
-                Console.WriteLine("Поставлена");
-            else if (muffin.Status == StatusMaffin.Overdue)
-                Console.WriteLine("Просрочена");
-            else if (muffin.Status == StatusMaffin.Sold)
-                Console.WriteLine("Продана");
-        }
+        Console.WriteLine($"Количество поставлено:{result.СountSupplied}");
+        Console.WriteLine($"Количество просрочено:{result.СountOverdued}");
+        Console.WriteLine($"Количество продано:{result.СountSolded}");
     }
     else
     {

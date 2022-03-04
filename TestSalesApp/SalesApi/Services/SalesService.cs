@@ -6,6 +6,7 @@ namespace SalesApi.Services
     {
         private readonly DataContext _context;
         private readonly ILogger<SalesService> _logger;
+
         /// <summary>
         /// Максимальное количество продаваемых маффинов
         /// </summary>
@@ -27,52 +28,62 @@ namespace SalesApi.Services
             _logger = logger;
         }
 
-        public void Buy(int countMuffin)
+        public bool Buy(int countMuffin)
         {
-            if (countMuffin <= maxCountBuyMuffin)
+            if (countMuffin > 0 && countMuffin <= maxCountBuyMuffin)
             {
-                var muffins = _context.Muffins.Where(m => m.DateCreate > DateTime.Now.AddMinutes(-lifetimeMuffin) && m.Status == StatusMaffin.Supplied).OrderBy(m => m.DateCreate).Take(countMuffin);
+                var muffins = _context.Muffins.Where(m => m.DateCreate > DateTime.Now.AddMinutes(-lifetimeMuffin) && m.Status == StatusMaffin.Supplied).
+                    OrderBy(m => m.DateCreate).Take(countMuffin);
                 if (muffins.Count() == countMuffin)
                 {
-                    foreach(var muffin in muffins)
+                    foreach (var muffin in muffins)
                     {
-                        muffin.Status = StatusMaffin.Sold;
+                        muffin.Status = StatusMaffin.Solded;
                         _context.Muffins.Update(muffin);
                         _logger.LogInformation($"Изменен статус Id={muffin.Id} на продано");
                     }
                     _context.SaveChanges();
-                }
-                else
-                {
-                    throw new Exception("Нет маффинов соответсвующих условиям продажи");
+                    return true;
                 }
             }
-            else
-            {
-                throw new Exception("Количество маффинов превышает допустимое");
-            }
+            return false;
         }
 
-        public void Create()
+        public Muffin Create()
         {
             Muffin muffin = new Muffin();
             _context.Muffins.Add(muffin);
-            _logger.LogInformation($"Добавлена запись с датой создания {muffin.DateCreate} со статусом поставлена");
             _context.SaveChanges();
+            _logger.LogInformation($"Добавлена запись Id={muffin.Id} с датой создания {muffin.DateCreate} со статусом поставлена");
+            return muffin; ;
         }
 
-        public IEnumerable<Muffin> GetReport()
+        public MuffinReport GetReport()
+        {
+            UpdateStatusMuffins();
+            var muffins = _context.Muffins.Where(m => m.DateCreate > DateTime.Now.AddDays(-maxDayReport)).OrderBy(m => m.Status);
+
+            MuffinReport report = new MuffinReport();
+            report.СountSupplied = muffins.Count(m => m.Status == StatusMaffin.Supplied);
+            report.СountSolded = muffins.Count(m => m.Status == StatusMaffin.Solded);
+            report.СountOverdued = muffins.Count(m => m.Status == StatusMaffin.Overdued);
+
+            return report;
+        }
+
+        /// <summary>
+        /// Обновление статусов маффинов в БД
+        /// </summary>
+        private void UpdateStatusMuffins()
         {
             var muffins = _context.Muffins.Where(m => m.DateCreate <= DateTime.Now.AddMinutes(-lifetimeMuffin) && m.Status == StatusMaffin.Supplied);
             foreach (var muffin in muffins)
             {
-                muffin.Status = StatusMaffin.Overdue;
+                muffin.Status = StatusMaffin.Overdued;
                 _context.Muffins.Update(muffin);
                 _logger.LogInformation($"Изменен статус Id={muffin.Id} на просрочено");
             }
             _context.SaveChanges();
-
-            return _context.Muffins.Where(m => m.DateCreate > DateTime.Now.AddDays(-maxDayReport)).OrderBy(m=>m.Status);
         }
     }
 }

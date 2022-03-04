@@ -6,11 +6,6 @@ namespace SalesApi.Models
     {
         protected readonly IConfiguration Configuration;
 
-        /// <summary>
-        /// Кол-во создаваемых маффинов
-        /// </summary>
-        private readonly int countCreateMuffin = 10;
-
         public DataContext(IConfiguration configuration)
         {
             Configuration = configuration;

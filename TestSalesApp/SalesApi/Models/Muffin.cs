@@ -2,6 +2,9 @@
 
 namespace SalesApi.Models
 {
+    /// <summary>
+    /// Статус, который может быть маффин
+    /// </summary>
     public enum StatusMaffin
     {
         /// <summary>
@@ -12,17 +15,18 @@ namespace SalesApi.Models
         /// <summary>
         /// Продана
         /// </summary>
-        Sold,
+        Solded,
 
         /// <summary>
         /// Просрочена
         /// </summary>
-        Overdue
+        Overdued
     }
+
     public class Muffin
     {
         /// <summary>
-        /// Идентиикатор
+        /// Идентификатор
         /// </summary>
         [Column("id")]
         public int Id { get; set; }
@@ -30,7 +34,6 @@ namespace SalesApi.Models
         /// <summary>
         /// Дата производства
         /// </summary>
-        /// 
         [Column("datecreate")]
         public DateTime DateCreate { get; set; } = DateTime.Now;
 
